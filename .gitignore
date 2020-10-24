@@ -1,5 +1,8 @@
+# Project specific ignores
+config.txt
+venv2/
 
-
+# --General Python Ignores--
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
