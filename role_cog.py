@@ -1,6 +1,7 @@
 from discord.ext import commands, tasks
 from discord.utils import get
 import data
+import json
 import rally_api
 
 
@@ -40,20 +41,27 @@ class Role_Gate(commands.Cog):
     async def unset_coin_for_role(self, ctx, coin_name, coin_amount: int, role_name):
         if ctx.guild is None:
             return
-        data.remove_role_coin_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
-        ctx.send("Set")
+        data.remove_role_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
+        await ctx.send("Unset")
 
     @commands.command(name="get_role_mapping", help="Get role mappings")
     @owner_or_permissions(administrator=True)
     async def get_role_mappings(self, ctx):
-        await ctx.send(str(data.get_role_mappings(ctx.guild.id)))
+        await ctx.send(
+            json.dumps(
+                [
+                    json.dumps(mapping)
+                    for mapping in data.get_role_mappings(ctx.guild.id)
+                ]
+            )
+        )
 
     @commands.command(name="set_rally_id", help="Set your rally id")
     async def set_rally_id(self, ctx, rally_id):
         data.add_discord_rally_mapping(ctx.author.id, rally_id)
         await ctx.sent("Set")
 
-    @tasks.loop(seconds=60.0)
+    @tasks.loop(seconds=3600.0)
     async def update_roles(self):
         print("Updating roles")
         guilds = self.bot.guilds
