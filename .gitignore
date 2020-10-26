@@ -1,6 +1,7 @@
 # Project specific ignores
 config.txt
 venv2/
+data.db
 
 # --General Python Ignores--
 
