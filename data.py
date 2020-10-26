@@ -37,7 +37,7 @@ def get_role_mappings(guild_id, coin=None, required_balance=None, role=None):
     return filtered_mappings
 
 
-def remove_role_mappings(guild_id, coin, required_balance, role):
+def remove_role_mapping(guild_id, coin, required_balance, role):
     global db
     table = db["mappings"]
     table.delete(
