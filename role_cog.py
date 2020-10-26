@@ -33,6 +33,16 @@ class Role_Gate(commands.Cog):
             return
         data.add_role_coin_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
 
+    @commands.command(
+        name="unset_role_mapping", help="Unset a mapping between coin and role"
+    )
+    @owner_or_permissions(administrator=True)
+    async def unset_coin_for_role(self, ctx, coin_name, coin_amount: int, role_name):
+        if ctx.guild is None:
+            return
+        data.remove_role_coin_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
+        ctx.send("Set")
+
     @commands.command(name="get_role_mapping", help="Get role mappings")
     @owner_or_permissions(administrator=True)
     async def get_role_mappings(self, ctx):
@@ -54,13 +64,16 @@ class Role_Gate(commands.Cog):
                 rally_id = data.get_rally_id(member.id)
                 if rally_id is not None:
                     for role_mapping in role_mappings:
+                        role_to_assign = get(guild.roles, name=role_mapping["role"])
                         if (
                             rally_api.get_balance_of_coin(
                                 rally_id, role_mapping["coinKind"]
                             )
                             > role_mapping["requiredBalance"]
                         ):
-                            role_to_assign = get(guild.roles, name=role_mapping["role"])
                             if role_to_assign is not None:
                                 await member.add_roles(role_to_assign)
                                 print("Updated role for a member")
+                        else:
+                            if role_to_assign in member.roles:
+                                await member.remove_roles(role_to_assign)

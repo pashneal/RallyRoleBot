@@ -37,6 +37,14 @@ def get_role_mappings(guild_id, coin=None, required_balance=None, role=None):
     return filtered_mappings
 
 
+def remove_role_mappings(guild_id, coin, required_balance, role):
+    global db
+    table = db["mappings"]
+    table.delete(
+        guildId=guild_id, coinKind=coin, requiredBalance=required_balance, role=role
+    )
+
+
 def add_discord_rally_mapping(discord_id, rally_id):
     global db
     table = db["rally_connections"]
