@@ -15,6 +15,7 @@ CHANNEL_NAME_KEY = "channel"
 DISCORD_ID_KEY = "discordId"
 RALLY_ID_KEY = "rallyId"
 
+
 def connect_db():
     global db
     db = dataset.connect(config.CONFIG.database_connection)
@@ -72,7 +73,9 @@ def get_channel_mappings(guild_id, coin=None, required_balance=None, channel=Non
             m for m in filtered_mappings if m[REQUIRED_BALANCE_KEY] == required_balance
         ]
     if channel is not None:
-        filtered_mappings = [m for m in filtered_mappings if m[CHANNEL_NAME_KEY] == channel]
+        filtered_mappings = [
+            m for m in filtered_mappings if m[CHANNEL_NAME_KEY] == channel
+        ]
     return filtered_mappings
 
 

@@ -4,6 +4,7 @@ import discord
 import data
 import json
 import rally_api
+import sys
 
 
 def owner_or_permissions(**perms):
@@ -29,7 +30,7 @@ class Role_Gate(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         # This prevents any commands with local handlers being handled here in on_command_error.
-        if hasattr(ctx.command, 'on_error'):
+        if hasattr(ctx.command, "on_error"):
             return
 
         # This prevents any cogs with an overwritten cog_command_error being handled here.
@@ -38,22 +39,24 @@ class Role_Gate(commands.Cog):
             if cog._get_overridden_method(cog.cog_command_error) is not None:
                 return
 
-        ignored = (commands.CommandNotFound, )
+        ignored = (commands.CommandNotFound,)
 
         # Allows us to check for original exceptions raised and sent to CommandInvokeError.
         # If nothing is found. We keep the exception passed to on_command_error.
-        error = getattr(error, 'original', error)
+        error = getattr(error, "original", error)
 
         # Anything in ignored will return and prevent anything happening.
         if isinstance(error, ignored):
             return
 
         if isinstance(error, commands.DisabledCommand):
-            await ctx.send(f'{ctx.command} has been disabled.')
+            await ctx.send(f"{ctx.command} has been disabled.")
 
         elif isinstance(error, commands.NoPrivateMessage):
             try:
-                await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
+                await ctx.author.send(
+                    f"{ctx.command} can not be used in Private Messages."
+                )
             except discord.HTTPException:
                 pass
 
@@ -66,7 +69,17 @@ class Role_Gate(commands.Cog):
 
         else:
             # All other Errors not returned come here. And we can just print the default TraceBack.
-            print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+            print(
+                "Ignoring exception in command {}:".format(ctx.command), file=sys.stderr
+            )
+
+    async def is_valid_role(self, ctx, role_name):
+        if get(ctx.guild.roles, name=role_name) is None:
+            await ctx.send(
+                "Role does not exist on this server. Please create it first."
+            )
+            return False
+        return True
 
     @commands.command(
         name="set_role_mapping",
@@ -75,9 +88,13 @@ class Role_Gate(commands.Cog):
     )
     # @owner_or_permissions(administrator=True)
     async def set_coin_for_role(self, ctx, coin_name, coin_amount: int, role_name):
+        if not await self.is_valid_role(ctx, role_name):
+            return
         if ctx.guild is None:
+            await ctx.send("Please send this command in a server.")
             return
         data.add_role_coin_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
+        await ctx.send("Set")
 
     @commands.command(
         name="one_time_role_mapping",
@@ -85,7 +102,10 @@ class Role_Gate(commands.Cog):
         + " Set a mapping to be applied once instantly.",
     )
     async def one_time_role_mapping(self, ctx, coin_name, coin_amount: int, role_name):
+        if not await self.is_valid_role(ctx, role_name):
+            return
         if ctx.guild is None:
+            ctx.send("Please send this command in a server.")
             return
         for member in ctx.guild.members:
             await self.grant_deny_role_to_member(
@@ -107,6 +127,7 @@ class Role_Gate(commands.Cog):
     # @owner_or_permissions(administrator=True)
     async def set_coin_for_channel(self, ctx, coin_name, coin_amount: int, role_name):
         if ctx.guild is None:
+            await ctx.send("Please send this command in a server")
             return
         data.add_channel_coin_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
         await ctx.send("Done")
@@ -120,6 +141,7 @@ class Role_Gate(commands.Cog):
         self, ctx, coin_name, coin_amount: int, channel_name
     ):
         if ctx.guild is None:
+            await ctx.send("Please send this command in a server")
             return
         for member in ctx.guild.members:
             await self.grant_deny_channel_to_member(
@@ -141,6 +163,7 @@ class Role_Gate(commands.Cog):
     # @owner_or_permissions(administrator=True)
     async def unset_coin_for_role(self, ctx, coin_name, coin_amount: int, role_name):
         if ctx.guild is None:
+            await ctx.send("Please send this command in a server")
             return
         data.remove_role_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
         await ctx.send("Unset")
@@ -155,6 +178,7 @@ class Role_Gate(commands.Cog):
         self, ctx, coin_name, coin_amount: int, channel_name
     ):
         if ctx.guild is None:
+            await ctx.send("Please send this command in a server")
             return
         data.remove_channel_mapping(ctx.guild.id, coin_name, coin_amount, channel_name)
         await ctx.send("Unset")
@@ -184,9 +208,22 @@ class Role_Gate(commands.Cog):
         )
 
     @commands.command(name="set_rally_id", help="Set your rally id")
-    async def set_rally_id(self, ctx, rally_id):
-        data.add_discord_rally_mapping(ctx.author.id, rally_id)
-        await ctx.sent("Set")
+    async def set_rally_id(self, ctx, rally_id=None):
+        if ctx.guild.id is None:
+            if rally_id is not None:
+                data.add_discord_rally_mapping(ctx.author.id, rally_id)
+                await ctx.send("Set!")
+            else:
+                await ctx.send("You must include your rally id")
+        else:
+            if rally_id is not None:
+                data.add_discord_rally_mapping(ctx.author.id, rally_id)
+                await ctx.send("Set!")
+            else:
+                await ctx.author.send(
+                    "Set your rally id by responding with $set_rally_id <your_rally_id>"
+                )
+                await ctx.send("DM sent")
 
     async def grant_deny_channel_to_member(self, channel_mapping, member):
         print("Checking channel")

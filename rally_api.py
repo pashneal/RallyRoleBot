@@ -17,6 +17,7 @@ def get_balances(rally_id):
         print(result.status_code)
         print(type(result.json()))
         print(result.json())
+        return None
     return result.json()
 
 
