@@ -1,6 +1,9 @@
 import requests
 import json
 
+COIN_KIND_KEY = "coinKind"
+COIN_BALANCE_KEY = "coinBalance"
+
 
 BASE_URL = "https://api.rally.io/v1"
 
@@ -19,6 +22,6 @@ def get_balances(rally_id):
 
 def get_balance_of_coin(rally_id, coin_name):
     for coin_balance in get_balances(rally_id):
-        if coin_balance["coinKind"] == coin_name:
-            return float(coin_balance["coinBalance"])
+        if coin_balance[COIN_KIND_KEY] == coin_name:
+            return float(coin_balance[COIN_BALANCE_KEY])
     return 0.0

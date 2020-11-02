@@ -26,6 +26,48 @@ class Role_Gate(commands.Cog):
     async def on_ready(self):
         print("We have logged in as {0.user}".format(self.bot))
 
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        # This prevents any commands with local handlers being handled here in on_command_error.
+        if hasattr(ctx.command, 'on_error'):
+            return
+
+        # This prevents any cogs with an overwritten cog_command_error being handled here.
+        cog = ctx.cog
+        if cog:
+            if cog._get_overridden_method(cog.cog_command_error) is not None:
+                return
+
+        ignored = (commands.CommandNotFound, )
+
+        # Allows us to check for original exceptions raised and sent to CommandInvokeError.
+        # If nothing is found. We keep the exception passed to on_command_error.
+        error = getattr(error, 'original', error)
+
+        # Anything in ignored will return and prevent anything happening.
+        if isinstance(error, ignored):
+            return
+
+        if isinstance(error, commands.DisabledCommand):
+            await ctx.send(f'{ctx.command} has been disabled.')
+
+        elif isinstance(error, commands.NoPrivateMessage):
+            try:
+                await ctx.author.send(f'{ctx.command} can not be used in Private Messages.')
+            except discord.HTTPException:
+                pass
+
+        # For this error example we check to see where it came from...
+        elif isinstance(error, commands.BadArgument):
+            await ctx.send("Bad argument")
+
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("Command missing arguments")
+
+        else:
+            # All other Errors not returned come here. And we can just print the default TraceBack.
+            print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+
     @commands.command(
         name="set_role_mapping",
         help=" <coin name> <coin amount> <role name> "
@@ -46,12 +88,12 @@ class Role_Gate(commands.Cog):
         if ctx.guild is None:
             return
         for member in ctx.guild.members:
-            await self.apply_mapping_to_member(
+            await self.grant_deny_role_to_member(
                 {
-                    "guildId": ctx.guild.id,
-                    "coinKind": coin_name,
-                    "requiredBalance": coin_amount,
-                    "role": role_name,
+                    data.GUILD_ID_KEY: ctx.guild.id,
+                    data.COIN_KIND_KEY: coin_name,
+                    data.REQUIRED_BALANCE_KEY: coin_amount,
+                    data.ROLE_NAME_KEY: role_name,
                 },
                 member,
             )
@@ -82,10 +124,10 @@ class Role_Gate(commands.Cog):
         for member in ctx.guild.members:
             await self.grant_deny_channel_to_member(
                 {
-                    "guildId": ctx.guild.id,
-                    "coinKind": coin_name,
-                    "requiredBalance": coin_amount,
-                    "channel": channel_name,
+                    data.GUILD_ID_KEY: ctx.guild.id,
+                    data.COIN_KIND_KEY: coin_name,
+                    data.REQUIRED_BALANCE_KEY: coin_amount,
+                    data.CHANNEL_NAME_KEY: channel_name,
                 },
                 member,
             )
@@ -154,14 +196,14 @@ class Role_Gate(commands.Cog):
         matched_channels = [
             channel
             for channel in member.guild.channels
-            if channel.name == channel_mapping["channel"]
+            if channel.name == channel_mapping[data.CHANNEL_NAME_KEY]
         ]
         if len(matched_channels) == 0:
             return
         channel_to_assign = matched_channels[0]
         if (
-            rally_api.get_balance_of_coin(rally_id, channel_mapping["coinKind"])
-            > channel_mapping["requiredBalance"]
+            rally_api.get_balance_of_coin(rally_id, channel_mapping[data.COIN_KIND_KEY])
+            > channel_mapping[data.REQUIRED_BALANCE_KEY]
         ):
             if channel_to_assign is not None:
                 await channel_to_assign.edit(
@@ -193,8 +235,8 @@ class Role_Gate(commands.Cog):
             return
         role_to_assign = get(member.guild.roles, name=role_mapping["role"])
         if (
-            rally_api.get_balance_of_coin(rally_id, role_mapping["coinKind"])
-            > role_mapping["requiredBalance"]
+            rally_api.get_balance_of_coin(rally_id, role_mapping[data.COIN_KIND_KEY])
+            > role_mapping[data.REQUIRED_BALANCE_KEY]
         ):
             if role_to_assign is not None:
                 await member.add_roles(role_to_assign)
