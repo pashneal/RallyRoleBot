@@ -203,7 +203,7 @@ class Role_Gate(commands.Cog):
     # @owner_or_permissions(administrator=True)
     async def force_update(self, ctx):
         self.update_roles.restart()
-        await ctx.send("Update complete")
+        await ctx.send("Updating!")
 
     @commands.command(name="get_channel_mappings", help="Get channel mappings")
     # @owner_or_permissions(administrator=True)
@@ -235,10 +235,10 @@ class Role_Gate(commands.Cog):
                 )
                 await ctx.send("DM sent")
 
-    async def grant_deny_channel_to_member(self, channel_mapping, member):
+    async def grant_deny_channel_to_member(self, channel_mapping, member, balances):
         print("Checking channel")
         rally_id = data.get_rally_id(member.id)
-        if rally_id is None:
+        if rally_id is None or balances is None:
             return
         matched_channels = [
             channel
@@ -250,8 +250,8 @@ class Role_Gate(commands.Cog):
         channel_to_assign = matched_channels[0]
         if channel_to_assign is not None:
             if (
-                rally_api.get_balance_of_coin(
-                    rally_id, channel_mapping[data.COIN_KIND_KEY]
+                rally_api.find_balance_of_coin(
+                    channel_mapping[data.COIN_KIND_KEY], balances
                 )
                 > channel_mapping[data.REQUIRED_BALANCE_KEY]
             ):
@@ -259,28 +259,25 @@ class Role_Gate(commands.Cog):
                 perms.send_messages = True
                 perms.read_messages = True
                 perms.read_message_history = True
-                await channel_to_assign.set_permissions(member, overwrites=perms)
+                await channel_to_assign.set_permissions(member, overwrite=perms)
                 print("Assigned channel to member")
             else:
                 perms = channel_to_assign.overwrites_for(member)
                 perms.send_messages = False
                 perms.read_messages = False
                 perms.read_message_history = False
-                await channel_to_assign.set_permissions(member, overwrites=perms)
+                await channel_to_assign.set_permissions(member, overwrite=perms)
                 print("Removed channel to member")
         else:
             print("Channel not found")
 
-    async def grant_deny_role_to_member(self, role_mapping, member):
+    async def grant_deny_role_to_member(self, role_mapping, member, balances):
         rally_id = data.get_rally_id(member.id)
-        print(rally_id)
-        if rally_id is None:
+        if rally_id is None or balances is None:
             return
         role_to_assign = get(member.guild.roles, name=role_mapping[data.ROLE_NAME_KEY])
-        print(rally_api.get_balance_of_coin(rally_id, role_mapping[data.COIN_KIND_KEY]))
-        print(role_mapping[data.REQUIRED_BALANCE_KEY])
         if (
-            rally_api.get_balance_of_coin(rally_id, role_mapping[data.COIN_KIND_KEY])
+            rally_api.find_balance_of_coin(role_mapping[data.COIN_KIND_KEY], balances)
             > role_mapping[data.REQUIRED_BALANCE_KEY]
         ):
             if role_to_assign is not None:
@@ -305,7 +302,12 @@ class Role_Gate(commands.Cog):
             for member in guild.members:
                 rally_id = data.get_rally_id(member.id)
                 if rally_id is not None:
+                    balances = rally_api.get_balances(rally_id)
                     for role_mapping in role_mappings:
-                        await self.grant_deny_role_to_member(role_mapping, member)
+                        await self.grant_deny_role_to_member(
+                            role_mapping, member, balances
+                        )
                     for channel_mapping in channel_mappings:
-                        await self.grant_deny_channel_to_member(channel_mapping, member)
+                        await self.grant_deny_channel_to_member(
+                            channel_mapping, member, balances
+                        )
