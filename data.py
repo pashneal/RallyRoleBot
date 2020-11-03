@@ -101,13 +101,13 @@ def remove_channel_mapping(guild_id, coin, required_balance, channel):
 def add_discord_rally_mapping(discord_id, rally_id):
     global db
     table = db[RALLY_CONNECTIONS_TABLE]
-    table.insert({DISCORD_ID_KEY: discord_id, RALLY_ID_KEY: rally_id})
+    table.upsert({DISCORD_ID_KEY: discord_id, RALLY_ID_KEY: rally_id}, [DISCORD_ID_KEY])
 
 
 def get_rally_id(discord_id):
     global db
     table = db[RALLY_CONNECTIONS_TABLE]
-    row = table.find_one(discordID=discord_id)
+    row = table.find_one(discordId=discord_id)
     if row is not None:
         return row[RALLY_ID_KEY]
     return None

@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime
 
 COIN_KIND_KEY = "coinKind"
 COIN_BALANCE_KEY = "coinBalance"
@@ -22,7 +23,10 @@ def get_balances(rally_id):
 
 
 def get_balance_of_coin(rally_id, coin_name):
-    for coin_balance in get_balances(rally_id):
+    balances = get_balances(rally_id)
+    if balances is None:
+        return 0.0
+    for coin_balance in balances:
         if coin_balance[COIN_KIND_KEY] == coin_name:
             return float(coin_balance[COIN_BALANCE_KEY])
     return 0.0

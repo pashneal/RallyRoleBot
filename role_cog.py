@@ -5,6 +5,7 @@ import data
 import json
 import rally_api
 import sys
+import traceback
 
 
 def owner_or_permissions(**perms):
@@ -71,6 +72,9 @@ class Role_Gate(commands.Cog):
             # All other Errors not returned come here. And we can just print the default TraceBack.
             print(
                 "Ignoring exception in command {}:".format(ctx.command), file=sys.stderr
+            )
+            traceback.print_exception(
+                type(error), error, error.__traceback__, file=sys.stderr
             )
 
     async def is_valid_role(self, ctx, role_name):
@@ -195,6 +199,12 @@ class Role_Gate(commands.Cog):
             )
         )
 
+    @commands.command(name="update", help="Force an immediate update")
+    # @owner_or_permissions(administrator=True)
+    async def force_update(self, ctx):
+        self.update_roles.restart()
+        await ctx.send("Update complete")
+
     @commands.command(name="get_channel_mappings", help="Get channel mappings")
     # @owner_or_permissions(administrator=True)
     async def get_channel_mappings(self, ctx):
@@ -238,39 +248,37 @@ class Role_Gate(commands.Cog):
         if len(matched_channels) == 0:
             return
         channel_to_assign = matched_channels[0]
-        if (
-            rally_api.get_balance_of_coin(rally_id, channel_mapping[data.COIN_KIND_KEY])
-            > channel_mapping[data.REQUIRED_BALANCE_KEY]
-        ):
-            if channel_to_assign is not None:
-                await channel_to_assign.edit(
-                    overwrites={
-                        member: discord.PermissionOverwrite(
-                            read_messages=True,
-                            send_messages=True,
-                            read_message_history=True,
-                        )
-                    }
+        if channel_to_assign is not None:
+            if (
+                rally_api.get_balance_of_coin(
+                    rally_id, channel_mapping[data.COIN_KIND_KEY]
                 )
+                > channel_mapping[data.REQUIRED_BALANCE_KEY]
+            ):
+                perms = channel_to_assign.overwrites_for(member)
+                perms.send_messages = True
+                perms.read_messages = True
+                perms.read_message_history = True
+                await channel_to_assign.set_permissions(member, overwrites=perms)
                 print("Assigned channel to member")
-        else:
-            if channel_to_assign is not None:
-                await channel_to_assign.edit(
-                    overwrites={
-                        member: discord.PermissionOverwrite(
-                            read_messages=False,
-                            send_messages=False,
-                            read_message_history=False,
-                        )
-                    }
-                )
+            else:
+                perms = channel_to_assign.overwrites_for(member)
+                perms.send_messages = False
+                perms.read_messages = False
+                perms.read_message_history = False
+                await channel_to_assign.set_permissions(member, overwrites=perms)
                 print("Removed channel to member")
+        else:
+            print("Channel not found")
 
     async def grant_deny_role_to_member(self, role_mapping, member):
         rally_id = data.get_rally_id(member.id)
+        print(rally_id)
         if rally_id is None:
             return
-        role_to_assign = get(member.guild.roles, name=role_mapping["role"])
+        role_to_assign = get(member.guild.roles, name=role_mapping[data.ROLE_NAME_KEY])
+        print(rally_api.get_balance_of_coin(rally_id, role_mapping[data.COIN_KIND_KEY]))
+        print(role_mapping[data.REQUIRED_BALANCE_KEY])
         if (
             rally_api.get_balance_of_coin(rally_id, role_mapping[data.COIN_KIND_KEY])
             > role_mapping[data.REQUIRED_BALANCE_KEY]
@@ -278,6 +286,9 @@ class Role_Gate(commands.Cog):
             if role_to_assign is not None:
                 await member.add_roles(role_to_assign)
                 print("Assigned role to member")
+            else:
+                print("Can't find role")
+                print(role_mapping["role"])
         else:
             if role_to_assign in member.roles:
                 await member.remove_roles(role_to_assign)
@@ -289,8 +300,8 @@ class Role_Gate(commands.Cog):
         guilds = self.bot.guilds
         for guild in guilds:
             await guild.chunk()
-            role_mappings = data.get_role_mappings(guild.id)
-            channel_mappings = data.get_channel_mappings(guild.id)
+            role_mappings = list(data.get_role_mappings(guild.id))
+            channel_mappings = list(data.get_channel_mappings(guild.id))
             for member in guild.members:
                 rally_id = data.get_rally_id(member.id)
                 if rally_id is not None:
