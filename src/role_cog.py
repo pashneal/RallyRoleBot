@@ -52,7 +52,9 @@ class RoleCommands(commands.Cog):
             await ctx.send("Bad argument")
 
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Command missing arguments")
+            await ctx.send(
+                "Command missing arguments. Role commands require coin name, coin amount, and role name. Example: set_role_mapping STANZ 10 Role1"
+            )
 
         else:
             # All other Errors not returned come here. And we can just print the default TraceBack.
@@ -68,7 +70,7 @@ class RoleCommands(commands.Cog):
         help=" <coin name> <coin amount> <role name> "
         + "Set a mapping between coin and role. Roles will be constantly updated.",
     )
-    # @validation.owner_or_permissions(administrator=True)
+    @validation.owner_or_permissions(administrator=True)
     async def set_coin_for_role(self, ctx, coin_name, coin_amount: int, role_name):
         if not await validation.is_valid_role(ctx, role_name):
             return
@@ -83,6 +85,7 @@ class RoleCommands(commands.Cog):
         help=" <coin name> <coin amount> <role name>"
         + " Set a mapping to be applied once instantly.",
     )
+    @validation.owner_or_permissions(administrator=True)
     async def one_time_role_mapping(self, ctx, coin_name, coin_amount: int, role_name):
         if not await validation.is_valid_role(ctx, role_name):
             return
@@ -110,7 +113,7 @@ class RoleCommands(commands.Cog):
         help=" <coin name> <coin amount> <role name> "
         + "Unset a mapping between coin and role",
     )
-    # @validation.owner_or_permissions(administrator=True)
+    @validation.owner_or_permissions(administrator=True)
     async def unset_coin_for_role(self, ctx, coin_name, coin_amount: int, role_name):
         if ctx.guild is None:
             await ctx.send("Please send this command in a server")
@@ -119,7 +122,7 @@ class RoleCommands(commands.Cog):
         await ctx.send("Unset")
 
     @commands.command(name="get_role_mappings", help="Get role mappings")
-    # @validation.owner_or_permissions(administrator=True)
+    @validation.owner_or_permissions(administrator=True)
     async def get_role_mappings(self, ctx):
         await ctx.send(
             json.dumps(

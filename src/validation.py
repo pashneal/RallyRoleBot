@@ -1,5 +1,6 @@
 from discord.ext import commands
 from discord.utils import get
+import rally_api
 
 
 def owner_or_permissions(**perms):
@@ -16,5 +17,22 @@ def owner_or_permissions(**perms):
 async def is_valid_role(ctx, role_name):
     if get(ctx.guild.roles, name=role_name) is None:
         await ctx.send("Role does not exist on this server. Please create it first.")
+        return False
+    return True
+
+
+async def is_valid_channel(ctx, channel_name):
+    matched_channels = [
+        channel for channel in ctx.guild.channels if channel.name == channel_name
+    ]
+    if len(matched_channels) == 0:
+        return False
+    return True
+
+
+async def is_valid_coin(ctx, coin_name):
+    valid = rally_api.valid_coin_symbol(coin_name)
+    if not valid:
+        await ctx.send("Coin " + coin_name + " does not seem to exist")
         return False
     return True

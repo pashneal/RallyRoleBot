@@ -6,6 +6,7 @@ import json
 import rally_api
 import sys
 import traceback
+import validation
 
 
 async def grant_deny_channel_to_member(channel_mapping, member, balances):
@@ -125,7 +126,7 @@ class UpdateTask(commands.Cog):
             )
 
     @commands.command(name="update", help="Force an immediate update")
-    # @validation.owner_or_permissions(administrator=True)
+    @validation.owner_or_permissions(administrator=True)
     async def force_update(self, ctx):
         self.update.restart()
         await ctx.send("Updating!")

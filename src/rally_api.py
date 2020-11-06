@@ -34,3 +34,16 @@ def find_balance_of_coin(coin_name, balances):
         if coin_balance[COIN_KIND_KEY] == coin_name:
             return float(coin_balance[COIN_BALANCE_KEY])
     return 0.0
+
+
+def valid_coin_symbol(coin_name):
+    url = BASE_URL + "/creator_coins/" + coin_name + "/price"
+    result = requests.get(url)
+    if result.status_code != 200:
+        print("Request error!")
+        print(url)
+        print(result.status_code)
+        print(type(result.json()))
+        print(result.json())
+        return False
+    return json.loads(result.json())["symbol"] is not None
