@@ -29,7 +29,7 @@ async def grant_deny_channel_to_member(channel_mapping, member, balances):
             rally_api.find_balance_of_coin(
                 channel_mapping[data.COIN_KIND_KEY], balances
             )
-            > channel_mapping[data.REQUIRED_BALANCE_KEY]
+            >= channel_mapping[data.REQUIRED_BALANCE_KEY]
         ):
             perms = channel_to_assign.overwrites_for(member)
             perms.send_messages = True
@@ -55,7 +55,7 @@ async def grant_deny_role_to_member(role_mapping, member, balances):
     role_to_assign = get(member.guild.roles, name=role_mapping[data.ROLE_NAME_KEY])
     if (
         rally_api.find_balance_of_coin(role_mapping[data.COIN_KIND_KEY], balances)
-        > role_mapping[data.REQUIRED_BALANCE_KEY]
+        >= role_mapping[data.REQUIRED_BALANCE_KEY]
     ):
         if role_to_assign is not None:
             await member.add_roles(role_to_assign)
