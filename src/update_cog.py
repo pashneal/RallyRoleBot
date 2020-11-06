@@ -126,7 +126,7 @@ class UpdateTask(commands.Cog):
         self.update.restart()
         await ctx.send("Updating!")
 
-    @tasks.loop(seconds=60.0)
+    @tasks.loop(seconds=600.0)
     async def update(self):
         print("Updating roles")
         guilds = self.bot.guilds

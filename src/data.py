@@ -25,26 +25,28 @@ def connect_db():
 def add_role_coin_mapping(guild_id, coin, required_balance, role):
     global db
     table = db[ROLE_MAPPINGS_TABLE]
-    table.insert(
+    table.upsert(
         {
             GUILD_ID_KEY: guild_id,
             COIN_KIND_KEY: coin,
             REQUIRED_BALANCE_KEY: required_balance,
             ROLE_NAME_KEY: role,
-        }
+        },
+        [GUILD_ID_KEY, ROLE_NAME_KEY],
     )
 
 
 def add_channel_coin_mapping(guild_id, coin, required_balance, channel):
     global db
     table = db[CHANNEL_MAPPINGS_TABLE]
-    table.insert(
+    table.upsert(
         {
             GUILD_ID_KEY: guild_id,
             COIN_KIND_KEY: coin,
             REQUIRED_BALANCE_KEY: required_balance,
             CHANNEL_NAME_KEY: channel,
-        }
+        },
+        [GUILD_ID_KEY, CHANNEL_NAME_KEY],
     )
 
 
@@ -84,7 +86,7 @@ def remove_role_mapping(guild_id, coin, required_balance, role):
     global db
     table = db[ROLE_MAPPINGS_TABLE]
     table.delete(
-        guildId=guild_id, coinKind=coin, requiredBalance=required_balance, role=role
+        guildId=guild_id, coinKind=coin, requiredBalance=required_balance, roleName=role
     )
 
 
