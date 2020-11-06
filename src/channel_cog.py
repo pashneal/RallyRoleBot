@@ -71,11 +71,17 @@ class ChannelCommands(commands.Cog):
         + "Set a mapping between coin and channel. Channel membership will be constantly updated.",
     )
     @validation.owner_or_permissions(administrator=True)
-    async def set_coin_for_channel(self, ctx, coin_name, coin_amount: int, role_name):
+    async def set_coin_for_channel(
+        self, ctx, coin_name, coin_amount: int, channel_name
+    ):
+        if not await validation.is_valid_channel(ctx, channel_name):
+            return
         if ctx.guild is None:
             await ctx.send("Please send this command in a server")
             return
-        data.add_channel_coin_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
+        data.add_channel_coin_mapping(
+            ctx.guild.id, coin_name, coin_amount, channel_name
+        )
         await ctx.send("Done")
 
     @commands.command(
@@ -87,6 +93,8 @@ class ChannelCommands(commands.Cog):
     async def one_time_channel_mapping(
         self, ctx, coin_name, coin_amount: int, channel_name
     ):
+        if not await validation.is_valid_channel(ctx, channel_name):
+            return
         if ctx.guild is None:
             await ctx.send("Please send this command in a server")
             return

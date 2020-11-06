@@ -27,6 +27,11 @@ async def is_valid_channel(ctx, channel_name):
         channel for channel in ctx.guild.channels if channel.name == channel_name
     ]
     if len(matched_channels) == 0:
+        await ctx.send(
+            "Cannot find the channel "
+            + channel_name
+            + " ensure that the bot has permissions for the channel."
+        )
         return False
     return True
 

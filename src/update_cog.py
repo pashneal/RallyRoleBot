@@ -135,19 +135,25 @@ class UpdateTask(commands.Cog):
 
     @tasks.loop(seconds=60.0)
     async def update(self):
-        print("Updating roles")
-        guilds = self.bot.guilds
-        for guild in guilds:
-            await guild.chunk()
-            role_mappings = list(data.get_role_mappings(guild.id))
-            channel_mappings = list(data.get_channel_mappings(guild.id))
-            for member in guild.members:
-                rally_id = data.get_rally_id(member.id)
-                if rally_id is not None:
-                    balances = rally_api.get_balances(rally_id)
-                    for role_mapping in role_mappings:
-                        await grant_deny_role_to_member(role_mapping, member, balances)
-                    for channel_mapping in channel_mappings:
-                        await grant_deny_channel_to_member(
-                            channel_mapping, member, balances
-                        )
+        try:
+            print("Updating roles")
+            guilds = self.bot.guilds
+            for guild in guilds:
+                await guild.chunk()
+                role_mappings = list(data.get_role_mappings(guild.id))
+                channel_mappings = list(data.get_channel_mappings(guild.id))
+                for member in guild.members:
+                    rally_id = data.get_rally_id(member.id)
+                    if rally_id is not None:
+                        balances = rally_api.get_balances(rally_id)
+                        for role_mapping in role_mappings:
+                            await grant_deny_role_to_member(
+                                role_mapping, member, balances
+                            )
+                        for channel_mapping in channel_mappings:
+                            await grant_deny_channel_to_member(
+                                channel_mapping, member, balances
+                            )
+        except Exception as e:
+            print(e)
+            print("Failure is not an option")
