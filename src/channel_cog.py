@@ -6,6 +6,7 @@ import json
 import rally_api
 import sys
 import traceback
+import update_cog
 
 
 class ChannelCommands(commands.Cog):
@@ -66,7 +67,7 @@ class ChannelCommands(commands.Cog):
         help=" <coin name> <coin amount> <channel name> "
         + "Set a mapping between coin and channel. Channel membership will be constantly updated.",
     )
-    # @owner_or_permissions(administrator=True)
+    # @validation.owner_or_permissions(administrator=True)
     async def set_coin_for_channel(self, ctx, coin_name, coin_amount: int, role_name):
         if ctx.guild is None:
             await ctx.send("Please send this command in a server")
@@ -86,15 +87,19 @@ class ChannelCommands(commands.Cog):
             await ctx.send("Please send this command in a server")
             return
         for member in ctx.guild.members:
-            await self.grant_deny_channel_to_member(
-                {
-                    data.GUILD_ID_KEY: ctx.guild.id,
-                    data.COIN_KIND_KEY: coin_name,
-                    data.REQUIRED_BALANCE_KEY: coin_amount,
-                    data.CHANNEL_NAME_KEY: channel_name,
-                },
-                member,
-            )
+            rally_id = data.get_rally_id(member.id)
+            if rally_id is not None:
+                balances = rally_api.get_balances(rally_id)
+                await update_cog.grant_deny_channel_to_member(
+                    {
+                        data.GUILD_ID_KEY: ctx.guild.id,
+                        data.COIN_KIND_KEY: coin_name,
+                        data.REQUIRED_BALANCE_KEY: coin_amount,
+                        data.CHANNEL_NAME_KEY: channel_name,
+                    },
+                    member,
+                    balances,
+                )
         await ctx.send("Done")
 
     @commands.command(
@@ -102,7 +107,7 @@ class ChannelCommands(commands.Cog):
         help=" <coin name> <coin amount> <channel name> "
         + "Unset a mapping between coin and channel",
     )
-    # @owner_or_permissions(administrator=True)
+    # @validation.owner_or_permissions(administrator=True)
     async def unset_coin_for_channel(
         self, ctx, coin_name, coin_amount: int, channel_name
     ):
@@ -113,7 +118,7 @@ class ChannelCommands(commands.Cog):
         await ctx.send("Unset")
 
     @commands.command(name="get_channel_mappings", help="Get channel mappings")
-    # @owner_or_permissions(administrator=True)
+    # @validation.owner_or_permissions(administrator=True)
     async def get_channel_mappings(self, ctx):
         await ctx.send(
             json.dumps(

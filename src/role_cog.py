@@ -6,6 +6,8 @@ import json
 import rally_api
 import sys
 import traceback
+import validation
+import update_cog
 
 
 class RoleCommands(commands.Cog):
@@ -66,9 +68,9 @@ class RoleCommands(commands.Cog):
         help=" <coin name> <coin amount> <role name> "
         + "Set a mapping between coin and role. Roles will be constantly updated.",
     )
-    # @owner_or_permissions(administrator=True)
+    # @validation.owner_or_permissions(administrator=True)
     async def set_coin_for_role(self, ctx, coin_name, coin_amount: int, role_name):
-        if not await self.is_valid_role(ctx, role_name):
+        if not await validation.is_valid_role(ctx, role_name):
             return
         if ctx.guild is None:
             await ctx.send("Please send this command in a server.")
@@ -82,21 +84,25 @@ class RoleCommands(commands.Cog):
         + " Set a mapping to be applied once instantly.",
     )
     async def one_time_role_mapping(self, ctx, coin_name, coin_amount: int, role_name):
-        if not await self.is_valid_role(ctx, role_name):
+        if not await validation.is_valid_role(ctx, role_name):
             return
         if ctx.guild is None:
             ctx.send("Please send this command in a server.")
             return
         for member in ctx.guild.members:
-            await self.grant_deny_role_to_member(
-                {
-                    data.GUILD_ID_KEY: ctx.guild.id,
-                    data.COIN_KIND_KEY: coin_name,
-                    data.REQUIRED_BALANCE_KEY: coin_amount,
-                    data.ROLE_NAME_KEY: role_name,
-                },
-                member,
-            )
+            rally_id = data.get_rally_id(member.id)
+            if rally_id is not None:
+                balances = rally_api.get_balances(rally_id)
+                await update_cog.grant_deny_role_to_member(
+                    {
+                        data.GUILD_ID_KEY: ctx.guild.id,
+                        data.COIN_KIND_KEY: coin_name,
+                        data.REQUIRED_BALANCE_KEY: coin_amount,
+                        data.ROLE_NAME_KEY: role_name,
+                    },
+                    member,
+                    balances,
+                )
         await ctx.send("Done")
 
     @commands.command(
@@ -104,7 +110,7 @@ class RoleCommands(commands.Cog):
         help=" <coin name> <coin amount> <role name> "
         + "Unset a mapping between coin and role",
     )
-    # @owner_or_permissions(administrator=True)
+    # @validation.owner_or_permissions(administrator=True)
     async def unset_coin_for_role(self, ctx, coin_name, coin_amount: int, role_name):
         if ctx.guild is None:
             await ctx.send("Please send this command in a server")
@@ -113,7 +119,7 @@ class RoleCommands(commands.Cog):
         await ctx.send("Unset")
 
     @commands.command(name="get_role_mappings", help="Get role mappings")
-    # @owner_or_permissions(administrator=True)
+    # @validation.owner_or_permissions(administrator=True)
     async def get_role_mappings(self, ctx):
         await ctx.send(
             json.dumps(
