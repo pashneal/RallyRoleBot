@@ -78,17 +78,10 @@ class UpdateTask(commands.Cog):
     async def on_ready(self):
         print("We have logged in as {0.user}".format(self.bot))
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def cog_command_error(self, ctx, error):
         # This prevents any commands with local handlers being handled here in on_command_error.
         if hasattr(ctx.command, "on_error"):
             return
-
-        # This prevents any cogs with an overwritten cog_command_error being handled here.
-        cog = ctx.cog
-        if cog:
-            if cog._get_overridden_method(cog.cog_command_error) is not None:
-                return
 
         ignored = (commands.CommandNotFound,)
 
@@ -135,25 +128,19 @@ class UpdateTask(commands.Cog):
 
     @tasks.loop(seconds=60.0)
     async def update(self):
-        try:
-            print("Updating roles")
-            guilds = self.bot.guilds
-            for guild in guilds:
-                await guild.chunk()
-                role_mappings = list(data.get_role_mappings(guild.id))
-                channel_mappings = list(data.get_channel_mappings(guild.id))
-                for member in guild.members:
-                    rally_id = data.get_rally_id(member.id)
-                    if rally_id is not None:
-                        balances = rally_api.get_balances(rally_id)
-                        for role_mapping in role_mappings:
-                            await grant_deny_role_to_member(
-                                role_mapping, member, balances
-                            )
-                        for channel_mapping in channel_mappings:
-                            await grant_deny_channel_to_member(
-                                channel_mapping, member, balances
-                            )
-        except Exception as e:
-            print(e)
-            print("Failure is not an option")
+        print("Updating roles")
+        guilds = self.bot.guilds
+        for guild in guilds:
+            await guild.chunk()
+            role_mappings = list(data.get_role_mappings(guild.id))
+            channel_mappings = list(data.get_channel_mappings(guild.id))
+            for member in guild.members:
+                rally_id = data.get_rally_id(member.id)
+                if rally_id is not None:
+                    balances = rally_api.get_balances(rally_id)
+                    for role_mapping in role_mappings:
+                        await grant_deny_role_to_member(role_mapping, member, balances)
+                    for channel_mapping in channel_mappings:
+                        await grant_deny_channel_to_member(
+                            channel_mapping, member, balances
+                        )
