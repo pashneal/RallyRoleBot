@@ -1,4 +1,3 @@
-
 from discord.ext import commands, tasks
 from discord.utils import get
 import discord
@@ -7,8 +6,6 @@ import json
 import rally_api
 import sys
 import traceback
-
-
 
 
 class UpdateTask(commands.Cog):
@@ -69,16 +66,11 @@ class UpdateTask(commands.Cog):
                 type(error), error, error.__traceback__, file=sys.stderr
             )
 
-
-
-
     @commands.command(name="update", help="Force an immediate update")
     # @owner_or_permissions(administrator=True)
     async def force_update(self, ctx):
         self.update.restart()
         await ctx.send("Updating!")
-
-
 
     async def grant_deny_channel_to_member(self, channel_mapping, member, balances):
         print("Checking channel")

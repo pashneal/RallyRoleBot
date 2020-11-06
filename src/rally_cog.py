@@ -1,4 +1,3 @@
-
 from discord.ext import commands, tasks
 from discord.utils import get
 import discord
@@ -9,12 +8,9 @@ import sys
 import traceback
 
 
-
-
 class RallyCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -64,8 +60,6 @@ class RallyCommands(commands.Cog):
             traceback.print_exception(
                 type(error), error, error.__traceback__, file=sys.stderr
             )
-
-
 
     @commands.command(name="set_rally_id", help="Set your rally id")
     async def set_rally_id(self, ctx, rally_id=None):

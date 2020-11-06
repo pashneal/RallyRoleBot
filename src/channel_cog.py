@@ -1,4 +1,3 @@
-
 from discord.ext import commands, tasks
 from discord.utils import get
 import discord
@@ -7,8 +6,6 @@ import json
 import rally_api
 import sys
 import traceback
-
-
 
 
 class ChannelCommands(commands.Cog):
@@ -64,8 +61,6 @@ class ChannelCommands(commands.Cog):
                 type(error), error, error.__traceback__, file=sys.stderr
             )
 
-
-
     @commands.command(
         name="set_channel_mapping",
         help=" <coin name> <coin amount> <channel name> "
@@ -102,7 +97,6 @@ class ChannelCommands(commands.Cog):
             )
         await ctx.send("Done")
 
-
     @commands.command(
         name="unset_channel_mapping",
         help=" <coin name> <coin amount> <channel name> "
@@ -118,8 +112,6 @@ class ChannelCommands(commands.Cog):
         data.remove_channel_mapping(ctx.guild.id, coin_name, coin_amount, channel_name)
         await ctx.send("Unset")
 
-
-
     @commands.command(name="get_channel_mappings", help="Get channel mappings")
     # @owner_or_permissions(administrator=True)
     async def get_channel_mappings(self, ctx):
@@ -131,4 +123,3 @@ class ChannelCommands(commands.Cog):
                 ]
             )
         )
-

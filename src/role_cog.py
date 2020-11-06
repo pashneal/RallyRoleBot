@@ -8,12 +8,9 @@ import sys
 import traceback
 
 
-
-
 class RoleCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -64,7 +61,6 @@ class RoleCommands(commands.Cog):
                 type(error), error, error.__traceback__, file=sys.stderr
             )
 
-
     @commands.command(
         name="set_role_mapping",
         help=" <coin name> <coin amount> <role name> "
@@ -103,7 +99,6 @@ class RoleCommands(commands.Cog):
             )
         await ctx.send("Done")
 
-
     @commands.command(
         name="unset_role_mapping",
         help=" <coin name> <coin amount> <role name> "
@@ -128,6 +123,3 @@ class RoleCommands(commands.Cog):
                 ]
             )
         )
-
-
-
