@@ -1,6 +1,7 @@
-import requests
 import json
 from datetime import datetime
+
+import requests
 
 COIN_KIND_KEY = "coinKind"
 COIN_BALANCE_KEY = "coinBalance"

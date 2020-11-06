@@ -1,11 +1,13 @@
-from discord.ext import commands, tasks
-from discord.utils import get
-import discord
-import data
 import json
-import rally_api
 import sys
 import traceback
+
+import discord
+from discord.ext import commands, tasks
+from discord.utils import get
+
+import data
+import rally_api
 import validation
 
 

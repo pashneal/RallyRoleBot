@@ -1,13 +1,14 @@
+import threading
+
 import discord
-from discord.ext import tasks, commands
+from discord.ext import commands, tasks
+
+import channel_cog
 import config
 import data
-import threading
-import role_cog
 import rally_cog
-import channel_cog
+import role_cog
 import update_cog
-
 
 if __name__ == "__main__":
     config.parse_args()

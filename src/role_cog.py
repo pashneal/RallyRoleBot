@@ -1,13 +1,15 @@
-from discord.ext import commands, tasks
-from discord.utils import get
-import discord
-import data
 import json
-import rally_api
 import sys
 import traceback
-import validation
+
+import discord
+from discord.ext import commands, tasks
+from discord.utils import get
+
+import data
+import rally_api
 import update_cog
+import validation
 
 
 class RoleCommands(commands.Cog):
