@@ -10,11 +10,11 @@ Once the bot has been added to your server you need to ensure that it can acess 
 
 The role for the bot must be above any roles it is meant to manage.
 
-![Bot role above managed roles](docs/Roles.png)
+![Bot role above managed roles](docs/Roles.PNG)
 
 The bot must also have permissions for any private channels it needs to manage.
 
-![Bot given permissions in channel](docs/Channel.png)
+![Bot given permissions in channel](docs/Channel.PNG)
 
 To set role or channel mappings for the bot to manage you must have the administrator privilege on your server.
 
