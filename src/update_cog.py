@@ -130,11 +130,17 @@ class UpdateTask(commands.Cog):
     async def update(self):
         print("Updating roles")
         guilds = self.bot.guilds
+        guild_count = 0
+        member_count = 0
+        mapping_count = 0
         for guild in guilds:
+            guild_count += 1
             await guild.chunk()
             role_mappings = list(data.get_role_mappings(guild.id))
             channel_mappings = list(data.get_channel_mappings(guild.id))
+            mapping_count += len(role_mappings) + len(channel_mappings)
             for member in guild.members:
+                member_count += 1
                 rally_id = data.get_rally_id(member.id)
                 if rally_id is not None:
                     balances = rally_api.get_balances(rally_id)
@@ -144,3 +150,12 @@ class UpdateTask(commands.Cog):
                         await grant_deny_channel_to_member(
                             channel_mapping, member, balances
                         )
+        print(
+            "Done! Checked "
+            + str(guild_count)
+            + " guilds. "
+            + str(mapping_count)
+            + " mappings. "
+            + str(member_count)
+            + " members."
+        )
