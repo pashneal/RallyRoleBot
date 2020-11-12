@@ -14,7 +14,7 @@ import validation
 async def grant_deny_channel_to_member(channel_mapping, member, balances):
     print("Checking channel")
     rally_id = data.get_rally_id(member.id)
-    if rally_id is None or balances is None:
+    if rally_id is None:
         return
     matched_channels = [
         channel
@@ -50,9 +50,11 @@ async def grant_deny_channel_to_member(channel_mapping, member, balances):
 
 async def grant_deny_role_to_member(role_mapping, member, balances):
     rally_id = data.get_rally_id(member.id)
-    if rally_id is None or balances is None:
+    if rally_id is None:
         return
     role_to_assign = get(member.guild.roles, name=role_mapping[data.ROLE_NAME_KEY])
+    print("Checking for coin " + role_mapping[data.COIN_KIND_KEY])
+    print(rally_api.find_balance_of_coin(role_mapping[data.COIN_KIND_KEY], balances))
     if (
         rally_api.find_balance_of_coin(role_mapping[data.COIN_KIND_KEY], balances)
         >= role_mapping[data.REQUIRED_BALANCE_KEY]
@@ -145,6 +147,7 @@ class UpdateTask(commands.Cog):
                 if rally_id is not None:
                     balances = rally_api.get_balances(rally_id)
                     for role_mapping in role_mappings:
+                        print(role_mapping)
                         await grant_deny_role_to_member(role_mapping, member, balances)
                     for channel_mapping in channel_mappings:
                         await grant_deny_channel_to_member(

@@ -58,7 +58,7 @@ class RallyCommands(commands.Cog):
 
     @commands.command(name="set_rally_id", help="Set your rally id")
     async def set_rally_id(self, ctx, rally_id=None):
-        if ctx.guild.id is None:
+        if ctx.guild is None:
             if rally_id is not None:
                 data.add_discord_rally_mapping(ctx.author.id, rally_id)
                 await ctx.send("Set!")

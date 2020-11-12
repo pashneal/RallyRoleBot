@@ -31,6 +31,8 @@ def get_balance_of_coin(rally_id, coin_name):
 
 
 def find_balance_of_coin(coin_name, balances):
+    if balances is None:
+        return 0.0
     for coin_balance in balances:
         if coin_balance[COIN_KIND_KEY] == coin_name:
             return float(coin_balance[COIN_BALANCE_KEY])
