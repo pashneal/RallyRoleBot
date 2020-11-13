@@ -77,6 +77,8 @@ class ChannelCommands(commands.Cog):
         data.add_channel_coin_mapping(
             ctx.guild.id, coin_name, coin_amount, channel_name
         )
+        update = self.bot.get_cog("UpdateTask")
+        await update.force_update(ctx)
         await ctx.send("Done")
 
     @commands.command(
@@ -107,6 +109,8 @@ class ChannelCommands(commands.Cog):
                     member,
                     balances,
                 )
+        update = self.bot.get_cog("UpdateTask")
+        await update.force_update(ctx)
         await ctx.send("Done")
 
     @commands.command(

@@ -73,6 +73,8 @@ class RoleCommands(commands.Cog):
             await ctx.send("Please send this command in a server.")
             return
         data.add_role_coin_mapping(ctx.guild.id, coin_name, coin_amount, role_name)
+        update = self.bot.get_cog("UpdateTask")
+        await update.force_update(ctx)
         await ctx.send("Set")
 
     @commands.command(
@@ -101,6 +103,8 @@ class RoleCommands(commands.Cog):
                     member,
                     balances,
                 )
+        update = self.bot.get_cog("UpdateTask")
+        await update.force_update(ctx)
         await ctx.send("Done")
 
     @commands.command(
