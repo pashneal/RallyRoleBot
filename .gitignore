@@ -3,6 +3,12 @@ config.txt
 venv2/
 data.db
 
+# Vim Autosave Ignores
+*.sw[a-z]
+
+# Vim Session Files
+*.vim
+
 # --General Python Ignores--
 
 # Byte-compiled / optimized / DLL files
