@@ -9,7 +9,11 @@ data.db
 # Vim Session Files
 *.vim
 
+# Test tokens
+bot_token
+
 # --General Python Ignores--
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
