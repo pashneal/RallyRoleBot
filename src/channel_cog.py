@@ -12,15 +12,28 @@ import update_cog
 import validation
 
 
-"""
-Module for
-"""
 
 class ChannelCommands(commands.Cog):
+    """
+        Cog for processing commands from a specifc channel.
+        Deals with removing, adding, and viewing mappings from Creator Coin to a channel.
+    """
     def __init__(self, bot):
         self.bot = bot
 
     async def cog_command_error(self, ctx, error):
+        """
+        A special method that is called whenever an error is dispatched inside this cog.
+        This is similar to on_command_error() except only applying to the commands inside this cog.
+        This must be a coroutine.
+
+        Parameters
+        __________
+
+          ctx (Context) – The invocation context where the error happened.
+          error (CommandError) – The error that happened.
+
+        """
         # This prevents any commands with local handlers being handled here in on_command_error.
         if hasattr(ctx.command, "on_error"):
             return
@@ -73,6 +86,20 @@ class ChannelCommands(commands.Cog):
     async def set_coin_for_channel(
         self, ctx, coin_name, coin_amount: int, channel_name
     ):
+        """
+          Iterate over all members in a guild and give a custom mapping.
+          Save that custom mapping to the database if the channel is valid.
+          Update the mapping after a globally specified amount of time has passed
+
+          Parameters
+          __________
+
+            ctx (discord.Context) – The invocation context where the command was issued.
+            coin_name (string) - The key/name given for the new coin
+            coin_amount (int)  - The amount of coin to allocate in the database
+            channel_name (string) - The channel to map the Creator Coin to.
+
+        """
         if not await validation.is_valid_channel(ctx, channel_name):
             return
         if ctx.guild is None:
@@ -92,6 +119,21 @@ class ChannelCommands(commands.Cog):
     async def one_time_channel_mapping(
         self, ctx, coin_name, coin_amount: int, channel_name
     ):
+        
+        """
+          Iterate over all members in a guild and give a custom mapping.
+          Save that custom mapping to the database if the channel is valid.
+          Do not monitor nor update the mapping.
+
+          Parameters
+          __________
+
+            ctx (discord.Context) – The invocation context where the command was issued.
+            coin_name (string) - The key/name given for the new coin
+            coin_amount (int)  - The amount of coin to allocate in the database
+            channel_name (string) - The channel to map the Creator Coin to.
+
+        """
         if not await validation.is_valid_channel(ctx, channel_name):
             return
         if ctx.guild is None:
@@ -122,6 +164,10 @@ class ChannelCommands(commands.Cog):
     async def unset_coin_for_channel(
         self, ctx, coin_name, coin_amount: int, channel_name
     ):
+        """
+            Takes a coin_name and amount and removes it from a given server
+        """
+
         if ctx.guild is None:
             await ctx.send("Please send this command in a server")
             return
@@ -131,6 +177,9 @@ class ChannelCommands(commands.Cog):
     @commands.command(name="get_channel_mappings", help="Get channel mappings")
     @validation.owner_or_permissions(administrator=True)
     async def get_channel_mappings(self, ctx):
+        """
+            Dumps a list of all mappings to the given channel
+        """
         await ctx.send(
             json.dumps(
                 [
