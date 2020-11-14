@@ -12,6 +12,10 @@ data.db
 # Test tokens
 bot_token
 
+# Batch files and Scripting executaables
+run_test.bat
+
+
 # --General Python Ignores--
 
 

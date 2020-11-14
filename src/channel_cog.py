@@ -12,6 +12,10 @@ import update_cog
 import validation
 
 
+"""
+Module for
+"""
+
 class ChannelCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
