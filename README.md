@@ -41,6 +41,5 @@ Windows: `.\venv\Scripts\Activate.ps1`
 
 `python src/main.py --secret_token <your_secret_token>`
 
-If you run into a Privileged Intents Error
-Your bot must have the following options enabled
+If you run into a Privileged Intents Error, your bot must have the following options enabled
 ![Privileged Intents Enabled](docs/PrivilegedIntents.PNG)
