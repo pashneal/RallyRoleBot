@@ -6,7 +6,7 @@ A bot for managing roles based on Rally.io holdings
 
 Click this link to add the bot to your server [https://discord.com/api/oauth2/authorize?client_id=769334375023640578&permissions=268438560&scope=bot](https://discord.com/api/oauth2/authorize?client_id=769334375023640578&permissions=268438560&scope=bot)
 
-Once the bot has been added to your server you need to ensure that it can acess and change your roles and channels.
+Once the bot has been added to your server you need to ensure that it can access and change your roles and channels.
 
 The role for the bot must be above any roles it is meant to manage.
 
@@ -33,11 +33,8 @@ More specifically:
 
 `python3 -m venv venv`
 
-`source venv/bin/activate`
-
-or 
-
-`.\venv\Scripts\Activate.ps1`
+Linux/MacOS: `source venv/bin/activate`
+Windows: `.\venv\Scripts\Activate.ps1`
 
 `pip install -r requirements.txt`
 
