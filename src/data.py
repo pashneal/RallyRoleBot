@@ -1,3 +1,29 @@
+"""Functions for managing a dataset SQL database
+
+# Schemas
+
+## mappings
+
+guildId
+coinKind
+requiredBalance
+roleName
+
+## channel_mappings
+
+guildId
+coinKind
+requiredBalance
+channelName
+
+## rally_connections
+
+discordId
+rallyId
+
+"""
+
+
 import dataset
 
 import config
