@@ -1,4 +1,4 @@
-# CryptoRoleBot 
+# RallyRoleBot 
 
 A bot for managing roles based on Rally.io holdings
 
@@ -28,7 +28,7 @@ This is a discord bot. To use it you must have a bot set up through
 the discord developers portal.
 
 
-Then simply install the requirements and run `python src/main.py --secret_token <your_secret_token>`
+Then simply install the requirements and run `python rallyrolebot/main.py --secret_token <your_secret_token>`
 
 More specifically:
 
@@ -39,7 +39,7 @@ Windows: `.\venv\Scripts\Activate.ps1`
 
 `pip install -r requirements.txt`
 
-`python src/main.py --secret_token <your_secret_token>`
+`python rallyrolebot/main.py --secret_token <your_secret_token>`
 
 If you run into a Privileged Intents Error, your bot must have the following options enabled
 ![Privileged Intents Enabled](docs/PrivilegedIntents.PNG)
