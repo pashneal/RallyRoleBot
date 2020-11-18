@@ -73,6 +73,7 @@ class RoleCommands(commands.Cog):
     async def unset_coin_for_role(self, ctx, coin_name, coin_amount: int, role : discord.Role):
         data.remove_role_mapping(ctx.guild.id, coin_name, coin_amount, role.name)
 
+    # TODO: this command might run the risk of not printing due to character limit 
     @commands.command(name="get_role_mappings", help="Get role mappings")
     @validation.owner_or_permissions(administrator=True)
     async def get_role_mappings(self, ctx):
