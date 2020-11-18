@@ -8,7 +8,6 @@ from discord.utils import get
 
 import data
 import rally_api
-import errors
 
 from utils import pretty_print, send_to_dm
 from constants import *

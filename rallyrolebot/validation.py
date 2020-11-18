@@ -14,7 +14,7 @@ def owner_or_permissions(**perms):
         --------
             True if the user is the owner of the guild or 
             the user satisfies all keyword arguments (ex. adminstrator = True)
-            and the command is run in a server
+            and the command is run in a server (Not a private message)
 
         Raises
         ---------
