@@ -3,6 +3,7 @@ from discord import Embed, Color
 import functools
 
 
+# TODO: make pretty_print scalable so character limit does not matter
 async def pretty_print(ctx, fields, caption="", title="", color=Color(0xFFFFFF)):
     """
         A method for printing to the Discord channel with a custom embed.
@@ -39,8 +40,6 @@ async def pretty_print(ctx, fields, caption="", title="", color=Color(0xFFFFFF))
         await ctx.send(content = caption, embed = embed )
     else:
         await ctx.send(embed = embed)
-
-        
 
 
 def create_dm(command_function):
