@@ -51,7 +51,7 @@ class ChannelCommands(commands.Cog):
     )
     @validation.owner_or_permissions(administrator=True)
     async def set_coin_for_channel(
-        self, ctx, coin_name, coin_amount: int, channel_name
+            self, ctx, coin_name, coin_amount: int, channel : discord.TextChannel
     ):
         """
           Iterate over all members in a guild and give a custom mapping.
@@ -68,14 +68,7 @@ class ChannelCommands(commands.Cog):
 
         """
 
-        if not await validation.is_valid_channel(ctx, channel_name):
-            return
-        if ctx.guild is None:
-            await ctx.send("Please send this command in a server")
-            return
-        data.add_channel_coin_mapping(
-            ctx.guild.id, coin_name, coin_amount, channel_name
-        )
+        data.add_channel_coin_mapping( ctx.guild.id, coin_name, coin_amount, channel.name)
 
     @commands.command(
         name="one_time_channel_mapping",
