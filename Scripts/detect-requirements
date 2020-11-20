@@ -1,3 +1,0 @@
-#!C:\Users\pashn\Github\RallyRoleBot\Scripts\python.exe
-from requirements_detector.run import run
-run()

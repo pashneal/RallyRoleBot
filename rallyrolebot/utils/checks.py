@@ -6,7 +6,6 @@ import errors
 
 # Case insensitive check for custom role
 def has_any_role(*roles):
-
     original = commands.has_any_role(roles).predicate
 
     @commands.guild_only()
