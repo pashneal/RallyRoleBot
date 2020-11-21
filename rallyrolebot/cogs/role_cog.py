@@ -55,7 +55,7 @@ class RoleCommands(commands.Cog):
             rally_id = data.get_rally_id(member.id)
             if rally_id:
                 balances = rally_api.get_balances(rally_id)
-     j          await update_cog.grant_deny_role_to_member(
+                await update_cog.grant_deny_role_to_member(
                     {
                         data.GUILD_ID_KEY: ctx.guild.id,
                         data.COIN_KIND_KEY: coin_name,
