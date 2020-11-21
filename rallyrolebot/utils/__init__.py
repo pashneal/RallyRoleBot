@@ -1,6 +1,6 @@
-from discord.ext import commands
 from discord import Embed, Color
-import functools
+
+from utils.ext import *
 
 
 # TODO: make pretty_print scalable so character limit does not matter
@@ -42,38 +42,7 @@ async def pretty_print(ctx, fields, caption="", title="", color=Color(0xFFFFFF))
         await ctx.send(embed = embed)
 
 
-def create_dm(command_function):
-    """
-        Decorator that creates a Direct Message (dm) and appends it to the current context. 
-        Must recieve a class function with a Context argument.
-        Useful in discord.Cog calls
-    """
 
-    # Preserve function name so discord can still call the command
-    @functools.wraps(command_function)
-    async def wrapper(cls, ctx, *args, **kwargs):
-        ctx.dm = None
-        try:
-            ctx.dm = await ctx.author.create_dm()
-        except:
-            print("Could not create dm")
-        await command_function(cls, ctx, *args, **kwargs)
-    return wrapper
-    
-def send_to_dm(command_function):
-    """
-        Decorator that creates a Direct Message (dm) and converts the current context to it
-        Must recieve a class function with a Context argument.
-        Useful in discord.Cog calls
-    """
 
-    # Preserve function name so discord can still call the command
-    @functools.wraps(command_function)
-    async def wrapper(cls, ctx, *args, **kwargs):
-        try:
-            ctx.channel = await ctx.author.create_dm()
-        except:
-            print("Could not create dm")
-        await command_function(cls, ctx, *args, **kwargs)
-    return wrapper
+
     

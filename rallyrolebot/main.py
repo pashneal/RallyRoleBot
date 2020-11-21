@@ -7,10 +7,7 @@ from discord.ext import commands, tasks
 import config
 import data
 
-import channel_cog
-import rally_cog
-import role_cog
-import update_cog
+from cogs import *
 
 if __name__ == "__main__":
     config.parse_args()

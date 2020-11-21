@@ -1,12 +1,14 @@
 import json
 import sys
 import traceback
+import threading
 
 import discord
 from discord.ext import commands, tasks
 from discord.utils import get
 
 from constants import *
+
 import errors
 import data
 import rally_api
@@ -16,7 +18,6 @@ async def grant_deny_channel_to_member(channel_mapping, member, balances):
     """
       Determine if the rally_id and balance for a channel is still valid for a particular member
       Update status in database.
-      (TODO: Unclear about this function, ask Calvin for clarification)
 
       Parameters
       __________
@@ -66,7 +67,6 @@ async def grant_deny_role_to_member(role_mapping, member, balances):
     """
       Determine if the rally_id and balance for a role is still valid for a particular member
       Update status in database.
-      (TODO: Unclear about this function, ask Calvin for clarification)
 
       Parameters
       __________
@@ -96,10 +96,13 @@ async def grant_deny_role_to_member(role_mapping, member, balances):
             await member.remove_roles(role_to_assign)
             print("Removed role to member")
 
+async def force_update(bot, ctx):
+    await bot.get_cog("UpdateTask").force_update(ctx)
 
 class UpdateTask(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.update_lock = threading.Lock()
         self.update.start()
 
     @commands.Cog.listener()
@@ -120,19 +123,44 @@ class UpdateTask(commands.Cog):
 
     @tasks.loop(seconds=UPDATE_WAIT_TIME)
     async def update(self):
-        print("Updating roles")
-        guilds = self.bot.guilds
-        for guild in guilds:
-            await guild.chunk()
-            role_mappings = list(data.get_role_mappings(guild.id))
-            channel_mappings = list(data.get_channel_mappings(guild.id))
-            for member in guild.members:
-                rally_id = data.get_rally_id(member.id)
-                if rally_id:
-                    balances = rally_api.get_balances(rally_id)
-                    for role_mapping in role_mappings:
-                        await grant_deny_role_to_member(role_mapping, member, balances)
-                    for channel_mapping in channel_mappings:
-                        await grant_deny_channel_to_member(
-                            channel_mapping, member, balances
-                        )
+        with self.update_lock:
+
+            print("Updating roles")
+            guilds = self.bot.guilds
+            guild_count = 0
+            member_count = 0
+            mapping_count = 0
+
+            for guild in guilds:
+
+                guild_count += 1
+                await guild.chunk()
+
+                role_mappings = list(data.get_role_mappings(guild.id))
+                channel_mappings = list(data.get_channel_mappings(guild.id))
+                mapping_count += len(role_mappings) + len(channel_mappings)
+
+                for member in guild.members:
+                    member_count += 1
+                    rally_id = data.get_rally_id(member.id)
+                    if rally_id:
+                        balances = rally_api.get_balances(rally_id)
+                        for role_mapping in role_mappings:
+                            print(role_mapping)
+                            await grant_deny_role_to_member(
+                                role_mapping, member, balances
+                            )
+                        for channel_mapping in channel_mappings:
+                            await grant_deny_channel_to_member(
+                                channel_mapping, member, balances
+                            )
+
+            print(
+                "Done! Checked "
+                + str(guild_count)
+                + " guilds. "
+                + str(mapping_count)
+                + " mappings. "
+                + str(member_count)
+                + " members."
+            )

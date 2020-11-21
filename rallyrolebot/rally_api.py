@@ -28,10 +28,10 @@ def get_balance_of_coin(rally_id, coin_name):
 
 
 def find_balance_of_coin(coin_name, balances):
+    if not balances: return 0.0
     for coin_balance in balances:
         if coin_balance[COIN_KIND_KEY] == coin_name:
             return float(coin_balance[COIN_BALANCE_KEY])
-    return 0.0
 
 
 def valid_coin_symbol(coin_name):

@@ -5,6 +5,25 @@ from constants import *
 
 db = None
 
+"""Functions for managing a dataset SQL database
+    # Schemas
+
+    #################### mappings ######################
+    guildId
+    coinKind
+    requiredBalance
+    roleName
+
+    #################### channel_mappings ######################
+    guildId
+    coinKind
+    requiredBalance
+    channelName
+
+    #################### rally_connections ######################
+    discordId
+    rallyId
+"""
 def connect_db():
     global db
     db = dataset.connect(config.CONFIG.database_connection)
