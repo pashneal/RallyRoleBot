@@ -3,7 +3,7 @@ import dataset
 import config
 from constants import *
 
-db = None
+from utils.ext import connect_db
 
 """Functions for managing a dataset SQL database
     # Schemas
@@ -24,13 +24,10 @@ db = None
     discordId
     rallyId
 """
-def connect_db():
-    global db
-    db = dataset.connect(config.CONFIG.database_connection)
 
 
-def add_role_coin_mapping(guild_id, coin, required_balance, role):
-    global db
+@connect_db
+def add_role_coin_mapping(db, guild_id, coin, required_balance, role):
     table = db[ROLE_MAPPINGS_TABLE]
     table.upsert(
         {
@@ -43,8 +40,8 @@ def add_role_coin_mapping(guild_id, coin, required_balance, role):
     )
 
 
-def add_channel_coin_mapping(guild_id, coin, required_balance, channel):
-    global db
+@connect_db
+def add_channel_coin_mapping(db, guild_id, coin, required_balance, channel):
     table = db[CHANNEL_MAPPINGS_TABLE]
     table.upsert(
         {
@@ -57,8 +54,9 @@ def add_channel_coin_mapping(guild_id, coin, required_balance, channel):
     )
 
 
-def get_role_mappings(guild_id, coin=None, required_balance=None, role=None):
-    global db
+@connect_db
+def get_role_mappings(db, guild_id, coin=None, required_balance=None, role=None):
+
     table = db[ROLE_MAPPINGS_TABLE]
     filtered_mappings = table.find(guildId=guild_id)
     if coin is not None:
@@ -72,8 +70,9 @@ def get_role_mappings(guild_id, coin=None, required_balance=None, role=None):
     return filtered_mappings
 
 
-def get_channel_mappings(guild_id, coin=None, required_balance=None, channel=None):
-    global db
+@connect_db
+def get_channel_mappings(db, guild_id, coin=None, required_balance=None, channel=None):
+
     table = db[CHANNEL_MAPPINGS_TABLE]
     filtered_mappings = table.find(guildId=guild_id)
     if coin is not None:
@@ -88,17 +87,18 @@ def get_channel_mappings(guild_id, coin=None, required_balance=None, channel=Non
         ]
     return filtered_mappings
 
+@connect_db
+def remove_role_mapping(db, guild_id, coin, required_balance, role):
 
-def remove_role_mapping(guild_id, coin, required_balance, role):
-    global db
     table = db[ROLE_MAPPINGS_TABLE]
     table.delete(
         guildId=guild_id, coinKind=coin, requiredBalance=required_balance, roleName=role
     )
 
 
-def remove_channel_mapping(guild_id, coin, required_balance, channel):
-    global db
+@connect_db
+def remove_channel_mapping(db, guild_id, coin, required_balance, channel):
+
     table = db[CHANNEL_MAPPINGS_TABLE]
     table.delete(
         guildId=guild_id,
@@ -107,15 +107,14 @@ def remove_channel_mapping(guild_id, coin, required_balance, channel):
         channel=channel,
     )
 
-
-def add_discord_rally_mapping(discord_id, rally_id):
-    global db
+@connect_db
+def add_discord_rally_mapping(db, discord_id, rally_id):
     table = db[RALLY_CONNECTIONS_TABLE]
     table.upsert({DISCORD_ID_KEY: discord_id, RALLY_ID_KEY: rally_id}, [DISCORD_ID_KEY])
 
+@connect_db
+def get_rally_id(db, discord_id):
 
-def get_rally_id(discord_id):
-    global db
     table = db[RALLY_CONNECTIONS_TABLE]
     row = table.find_one(discordId=discord_id)
     if row is not None:

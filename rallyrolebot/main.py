@@ -11,7 +11,6 @@ from cogs import *
 
 if __name__ == "__main__":
     config.parse_args()
-    data.connect_db()
     intents = discord.Intents.default()
     intents.guilds = True
     intents.members = True
