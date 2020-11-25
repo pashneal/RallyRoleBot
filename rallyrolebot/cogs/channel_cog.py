@@ -59,7 +59,7 @@ class ChannelCommands(commands.Cog):
             self, ctx, coin_name, coin_amount: int, channel : discord.TextChannel
     ):
         data.add_channel_coin_mapping( ctx.guild.id, coin_name, coin_amount, channel.name)
-        update_cog.force_update(self.bot, ctx)
+        await update_cog.force_update(self.bot, ctx)
 
 
     @commands.command(
@@ -84,7 +84,7 @@ class ChannelCommands(commands.Cog):
                     member,
                     balances,
                 )
-        update_cog.force_update(self.bot, ctx)
+        await update_cog.force_update(self.bot, ctx)
 
     @commands.command(
         name="unset_channel_mapping",

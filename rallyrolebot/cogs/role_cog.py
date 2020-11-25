@@ -42,7 +42,7 @@ class RoleCommands(commands.Cog):
     @validation.owner_or_permissions(administrator=True)
     async def set_coin_for_role(self, ctx, coin_name, coin_amount: int, role : discord.Role):
         data.add_role_coin_mapping(ctx.guild.id, coin_name, coin_amount, role.name)
-        update_cog.force_update(self.bot, ctx)
+        await update_cog.force_update(self.bot, ctx)
 
     @commands.command(
         name="one_time_role_mapping",
@@ -65,7 +65,7 @@ class RoleCommands(commands.Cog):
                     member,
                     balances,
                 )
-        update_cog.force_update(self.bot, ctx)
+        await update_cog.force_update(self.bot, ctx)
 
     @commands.command(
         name="unset_role_mapping",
