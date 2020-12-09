@@ -96,7 +96,7 @@ def standard_error_handler(error_function):
         elif isinstance(error, BadArgument):
             await ctx.send_help(ctx.command)
             await pretty_print(ctx,
-                  "Could not run command, is it formatted properly?" + extra ,
+                  str(error) +"\n" + extra ,
                   title="Error",
                   color=ERROR_COLOR)
             return
