@@ -4,10 +4,16 @@ import functools
 import dataset
 import config
 
+
+"""
+    Collection of useful decorators that are generally useful but do
+    not fall neatly in other categories
+"""
+
 def create_dm(cog_function):
     """
         Decorator that creates a Direct Message (dm) and appends it to the current context. 
-        Must recieve a class function with a Context argument.
+        Must receive a class function with a Context argument.
         Useful in discord.Cog calls
     """
 
@@ -25,7 +31,7 @@ def create_dm(cog_function):
 def send_to_dm(cog_function):
     """
         Decorator that creates a Direct Message (dm) and converts the current context to it
-        Must recieve a class function with a Context argument.
+        Must receive a class function with a Context argument.
         Useful in discord.Cog calls
     """
 
