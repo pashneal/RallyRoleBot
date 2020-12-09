@@ -48,7 +48,7 @@ def send_to_dm(cog_function):
 
 def connect_db(function):
     """
-        Decorator that creates a database object and inserts as its
+        Decorator that creates a database object and inserts it as 
         the first argument in the calling function.
         Useful to prevent global objects
     """
