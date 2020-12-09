@@ -44,4 +44,4 @@ def valid_coin_symbol(coin_name):
         print(type(result.json()))
         print(result.json())
         return False
-    return json.loads(result.json())["symbol"] is not None
+    return result.json()["symbol"] is not None
